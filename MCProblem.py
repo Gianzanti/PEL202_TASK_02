@@ -2,10 +2,11 @@ from typing import Literal, Tuple, Union
 
 class State():
     ''' Class that represents the state of the problem '''
-    def __init__(self, miss:int, cann:int, boat:Literal['L', 'R']) -> None:
+    def __init__(self, miss:int, cann:int, boat:Literal['L', 'R'], heuristic:float = 0.00) -> None:
         self.miss = miss
         self.cann = cann
         self.boat = boat
+        self.heuristic = heuristic
     
     def __repr__(self):
         ''' Returns a string representation of the state, mainly used to hash the state'''
@@ -23,12 +24,12 @@ class State():
 
 class Action():
     ''' Class that represents the actions of the problem'''
-    def __init__(self, miss:int, cann:int, direction:Literal['L', 'R'], cost:int, heuristic:int) -> None:
+    def __init__(self, miss:int, cann:int, direction:Literal['L', 'R'], cost:float=0.00) -> None:
         self.miss = miss
         self.cann = cann
         self.direction = direction
         self.cost = cost
-        self.heuristic = heuristic
+        # self.heuristic = heuristic
 
     def __repr__(self):
         ''' Returns a string representation of the state, mainly used to hash the state'''
@@ -36,16 +37,12 @@ class Action():
 
 class Node():
     ''' Class that represents the node of the solution problem'''
-    def __init__(self, state:State, parent:Union['Node', None]=None, action:Union[Action, None]=None, cost:int=0) -> None:
+    def __init__(self, state:State, parent:Union['Node', None]=None, action:Union[Action, None]=None, cost:float=0.00) -> None:
         self.state = state
         self.parent = parent
         self.action = action
         self.cost = cost
-        self.priority = 0
-    
-    def setPriority(self, priority:int) -> None:
-        ''' Sets the priority of the node, mainly used by the priority queue'''
-        self.priority = priority
+        self.priority = 0.00
 
     def __lt__(self, other: 'Node') -> bool:
         return self.priority < other.priority
@@ -73,30 +70,40 @@ class MCProblem():
         # set the goal state of the problem
         self.goalState = State(0, 0, 'L' if startMargin == 'R' else 'R')
 
-        # set the cache of actions
-        self.actionsCache:dict[str, list[Action]] = {}
-
-        # count the total of transitions made
-        self.transitionCount = 0
-
+        # set the cache of neighbors
+        self.neighborsCache:dict[str, list[Tuple[Action, State]]] = {}
 
     def reset(self) -> None:
         ''' Resets the problem to the initial state '''
-        self.transitionCount = 0
-        self.actionsCache = {}
+        self.neighborsCache = {}
 
-    def calculateHeuristic(self, state:State, action:Action) -> int:
-        ''' Calculates the heuristic of the action based on the current state
-            The heuristic is the number of people on the initial side of the boat.
-            Less people on the initial side of the boat, more likely the action is valid
-            The heuristic is inverted if the boat is moving to the opposite side. '''
-        
-        if (action.direction == self.initialState.boat):
-            return state.miss + state.cann - (action.miss + action.cann)
-        
-        return 99
+    # def calculateHeuristic(self, state:State, action:Action) -> int:
+    #     ''' Calculates the heuristic of the action based on the current state
+    #         The heuristic is the number of people on the initial side of the boat.
+    #         Less people on the initial side of the boat, more likely the action is valid
+    #         to reach the goal with less steps  '''
+      
+    #     return state.miss + state.cann - (action.miss + action.cann)
 
-    def generateActions(self, state:State) -> list[Action]:
+    # This heuristic is considered the best one for this problem
+    def calculateHeuristic(self, state:State) -> float:
+        ''' The difference heuristic is based on the idea of measuring the difference between 
+            the number of missionaries and cannibals on either side of the river.
+            
+            In this heuristic, the initial state is assigned a heuristic value of zero, 
+            and the goal state is assigned a heuristic value of one (since all the missionaries 
+            and cannibals must be on the opposite side of the river in the goal state). 
+            For all other states, the heuristic value is calculated as the absolute difference 
+            between the number of missionaries and cannibals on the original side of the river 
+            minus the number of missionaries and cannibals on the opposite side of the river, 
+            divided by the total number of people.            '''
+      
+        initMarginPeople = state.miss + state.cann
+        goalMarginPeople = self.groupSize * 2 - initMarginPeople
+        heuristic = abs(initMarginPeople - goalMarginPeople) / (self.groupSize * 2)
+        return heuristic
+
+    def generateActions(self, state:State) -> list[Tuple[Action, State]]:
         ''' Generates all the possible actions based on the current state.
             The actions are generated by all the possible combinations of people that can be moved.
             The actions are also generated by all the possible directions that the boat can move.
@@ -104,19 +111,20 @@ class MCProblem():
             The cost is set to 1 for all actions.
             The heuristic is calculated for each action. '''
         
-        actions:list[Action] = []
+        actions:list[Tuple[Action, State]] = []
         
         for miss in range(self.groupSize+1):
             for cann in range(self.groupSize+1):
                 directions: list[Literal['L', 'R']] = ['L', 'R']
                 for direction in directions:
-                    action = Action(miss, cann, direction, 1, 0)
+                    action = Action(miss, cann, direction, 1)
                     if self.validateAction(state, action):
-                        action.heuristic = self.calculateHeuristic(state, action)
-                        actions.append(action)
+                        newState = self.transitionModel(state, action)
+                        newState.heuristic = self.calculateHeuristic(newState)
+                        # action.heuristic = self.calculateHeuristic(state, action)
+                        actions.append((action, newState))
 
         return actions
-
 
     def validateAction(self, state:State, action:Action) -> bool:
         ''' Validates the action based on the current state.
@@ -166,35 +174,36 @@ class MCProblem():
         # can't have more cannibals than missionaires in any margin
         return (initialMargin['miss'] == 0 or initialMargin['miss'] >= initialMargin['cann']) and (oppositeMargin['miss'] == 0 or oppositeMargin['miss'] >= oppositeMargin['cann'])
 
-
-    def getValidActions(self, state:State) -> list[Action]:
+    def getValidActions(self, state:State) -> list[Tuple[Action, State]]:
         ''' Returns the valid actions based on the current state.
             The actions are cached to avoid recalculating them. '''
         
         key = repr(state)
 
-        if (key in self.actionsCache):
-            return self.actionsCache[key]
+        if (key in self.neighborsCache):
+            return self.neighborsCache[key]
         
-        self.actionsCache[key] = self.generateActions(state)
-        return self.actionsCache[key]
+        self.neighborsCache[key] = self.generateActions(state)
+        return self.neighborsCache[key]
 
+    def getNeighbors(self, state:State) -> list[Tuple[State, Action]]:
+        ''' Returns the neighbors for the current state.
+            The neighbors are the valid actions applied to the current state. '''
+        
+        neighbors:list[Tuple[State, Action]] = []
+
+        for action in self.getValidActions(state):
+            neighbors.append((action[1], action[0]))
+
+        return neighbors
     
     def transitionModel(self, state:State, action:Action) -> State:
         ''' Returns the new state based on the current state and the action.
             The new state is the current state with the action applied. '''
-        
-        newState = State(state.miss, state.cann, action.direction)
-
         if action.direction != self.initialState.boat:
-            newState.miss -= action.miss
-            newState.cann -= action.cann
-        else:
-            newState.miss += action.miss
-            newState.cann += action.cann
-
-        self.transitionCount += 1
-        return newState
+            return State(state.miss - action.miss, state.cann - action.cann, action.direction)
+        
+        return State(state.miss + action.miss, state.cann + action.cann, action.direction)
 
     def showSolution(self, path: list[Tuple[State, Union[Action, None]]]) -> None:
         ''' Prints the solution path in a nice format. '''
