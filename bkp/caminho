@@ -1,0 +1,72 @@
+[
+    ({'m': 3, 'c': 3, 'b': 0}, {'m': 0, 'c': 2, 'sentido': 1}, {'m': 3, 'c': 1, 'b': 1}),
+    ({'m': 3, 'c': 1, 'b': 1}, {'m': 0, 'c': 1, 'sentido': 0}, {'m': 3, 'c': 2, 'b': 0}),
+    ({'m': 3, 'c': 2, 'b': 0}, {'m': 0, 'c': 2, 'sentido': 1}, {'m': 3, 'c': 0, 'b': 1}),
+    ({'m': 3, 'c': 0, 'b': 1}, {'m': 0, 'c': 1, 'sentido': 0}, {'m': 3, 'c': 1, 'b': 0}),
+    ({'m': 3, 'c': 1, 'b': 0}, {'m': 1, 'c': 0, 'sentido': 1}, {'m': 2, 'c': 1, 'b': 1}),
+    ({'m': 2, 'c': 1, 'b': 1}, {'m': 0, 'c': 1, 'sentido': 0}, {'m': 2, 'c': 2, 'b': 0}),
+    ({'m': 2, 'c': 2, 'b': 0}, {'m': 0, 'c': 2, 'sentido': 1}, {'m': 2, 'c': 0, 'b': 1}),
+    ({'m': 2, 'c': 0, 'b': 1}, {'m': 0, 'c': 1, 'sentido': 0}, {'m': 2, 'c': 1, 'b': 0}),
+    ({'m': 2, 'c': 1, 'b': 0}, {'m': 1, 'c': 1, 'sentido': 1}, {'m': 1, 'c': 0, 'b': 1}),
+    ({'m': 1, 'c': 0, 'b': 1}, {'m': 0, 'c': 1, 'sentido': 0}, {'m': 1, 'c': 1, 'b': 0}),
+    ({'m': 1, 'c': 1, 'b': 0}, {'m': 1, 'c': 1, 'sentido': 1}, {'m': 0, 'c': 0, 'b': 1})
+]
+
+
+{
+    'parent': 
+    {
+        'parent': 
+        {
+            'parent': 
+            {
+                'parent': 
+                {
+                    'parent': 
+                    {
+                        'parent': 
+                        {
+                            'parent': 
+                            {
+                                'parent': 
+                                {
+                                    'parent': 
+                                    {
+                                        'parent': 
+                                        {
+                                            'parent': {
+                                                'state': {'miss': 3, 'cann': 3, 'boat': 'L'}
+                                            }, 
+                                            'action': {'miss': 0, 'cann': 2, 'direction': 'R', 'cost': 1, 'heuristic': 0}, 
+                                            'state': {'miss': 3, 'cann': 1, 'boat': 'R'}
+                                        }, 
+                                        'action': {'miss': 0, 'cann': 1, 'direction': 'L', 'cost': 1, 'heuristic': 0}, 
+                                        'state': {'miss': 3, 'cann': 2, 'boat': 'L'}
+                                    }, 
+                                    'action': {'miss': 0, 'cann': 2, 'direction': 'R', 'cost': 1, 'heuristic': 0}, 
+                                    'state': {'miss': 3, 'cann': 0, 'boat': 'R'}
+                                }, 
+                                'action': {'miss': 0, 'cann': 1, 'direction': 'L', 'cost': 1, 'heuristic': 0}, 
+                                'state': {'miss': 3, 'cann': 1, 'boat': 'L'}
+                            }, 
+                            'action': {'miss': 2, 'cann': 0, 'direction': 'R', 'cost': 1, 'heuristic': 0}, 
+                            'state': {'miss': 1, 'cann': 1, 'boat': 'R'}
+                        }, 
+                        'action': {'miss': 1, 'cann': 1, 'direction': 'L', 'cost': 1, 'heuristic': 0}, 
+                        'state': {'miss': 2, 'cann': 2, 'boat': 'L'}
+                    }, 
+                    'action': {'miss': 2, 'cann': 0, 'direction': 'R', 'cost': 1, 'heuristic': 0}, 
+                    'state': {'miss': 0, 'cann': 2, 'boat': 'R'}
+                }, 
+                'action': {'miss': 0, 'cann': 1, 'direction': 'L', 'cost': 1, 'heuristic': 0}, 
+                'state': {'miss': 0, 'cann': 3, 'boat': 'L'}
+            }, 
+            'action': {'miss': 0, 'cann': 2, 'direction': 'R', 'cost': 1, 'heuristic': 0}, 
+            'state': {'miss': 0, 'cann': 1, 'boat': 'R'}
+        }, 
+        'action': {'miss': 0, 'cann': 1, 'direction': 'L', 'cost': 1, 'heuristic': 0}, 
+        'state': {'miss': 0, 'cann': 2, 'boat': 'L'}
+    }, 
+    'action': {'miss': 0, 'cann': 2, 'direction': 'R', 'cost': 1, 'heuristic': 0}, 
+    'state': {'miss': 0, 'cann': 0, 'boat': 'R'}
+}
