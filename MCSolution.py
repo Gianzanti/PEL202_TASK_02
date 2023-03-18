@@ -14,7 +14,7 @@ class MCSolution():
         self.reached = []
         self.problem.reset()
 
-        match alghoritm:
+        match alghoritm.lower():
             case "dfs":
                 start = time.time()
                 if self.dfs(self.problem.initialState):
@@ -52,7 +52,7 @@ class MCSolution():
                 else:
                     print(f"\n\nNão foi possível resolver o problema - usando {alghoritm.upper()}")
                 
-            case "astar":
+            case "a*":
                 start = time.time()
                 solution = self.aStar()
                 if solution:
@@ -225,12 +225,11 @@ class MCSolution():
 def main():
     groupSize = 3
     boatCapacity = 2
+    algorithms = ["A*", "GBFS", "BFS", "DFS"]
+    showGraph = True
     solution = MCSolution(groupSize=groupSize, boatCapacity=boatCapacity)
-    solution.findSolution("dfs", show=True)
-    solution.findSolution("bfs", show=True)
-    solution.findSolution("gbfs", show=True)
-    solution.findSolution("astar", show=True)
-
+    for i in algorithms:
+        solution.findSolution(i, show=showGraph)
 
 if __name__ == "__main__":
     main()
