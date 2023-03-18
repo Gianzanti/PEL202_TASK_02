@@ -102,6 +102,7 @@ class MCProblem():
         goalMarginPeople = self.groupSize * 2 - initMarginPeople
         heuristic = abs(initMarginPeople - goalMarginPeople) / (self.groupSize * 2)
         return heuristic
+        # return 1
 
     def generateActions(self, state:State) -> list[Tuple[Action, State]]:
         ''' Generates all the possible actions based on the current state.
@@ -121,7 +122,6 @@ class MCProblem():
                     if self.validateAction(state, action):
                         newState = self.transitionModel(state, action)
                         newState.heuristic = self.calculateHeuristic(newState)
-                        # action.heuristic = self.calculateHeuristic(state, action)
                         actions.append((action, newState))
 
         return actions
